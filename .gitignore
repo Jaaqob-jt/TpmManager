@@ -2,6 +2,7 @@
 *.*~ 
 project.lock.json 
 .DS_Store *.pyc 
+*.pdf
 
 # Visual Studio Code 
 .VS Code
