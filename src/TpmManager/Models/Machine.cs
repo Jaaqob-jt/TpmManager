@@ -5,7 +5,7 @@ namespace TpmManager.Models
 {
     public class Machine
     {
-        public int MachineID { get; set; }
+        public int MachineId { get; set; }
         public string Name { get; set; }
         public string Location { get; set; }
         public string Type { get; set; }
