@@ -23,6 +23,6 @@ namespace TpmManager.Models
         public string Description { get; set; }
         public string Status { get; set; }
         public decimal Cost { get; set; }
-        public List<string> MediaConnected { get; set; }
+        public List<Media> MediaConnected { get; set; }
     }
 }
