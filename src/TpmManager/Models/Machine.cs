@@ -6,6 +6,19 @@ namespace TpmManager.Models
 {
     public class Machine
     {
+        public Machine(){}
+        public Machine(Machine mach)
+        {
+            MachineId = mach.MachineId;
+            Name = mach.Name;
+            Location = mach.Location;
+            Type = mach.Type;
+            DateOfInstallation = mach.DateOfInstallation;
+            Posts = mach.Posts;
+            Description = mach.Description;
+            Status = mach.Status;
+            MediaConnected = mach.MediaConnected;
+        }
         [Required]
         public int MachineId { get; set; }
         [Required]

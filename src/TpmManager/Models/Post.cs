@@ -7,14 +7,25 @@ namespace TpmManager.Models
 {
     public class Post
     {
+        public Post(){}
+        public Post(Post post)
+        {
+            PostId = post.PostId;
+            MachineId = post.MachineId;
+            Type = post.Type;
+            CreationDate = post.CreationDate;
+            Content = post.Content;
+            Author = post.Author;
+            Machine = post.Machine;
+        }
         [Required]
         public int MachineId { get; set; }
         [Required]
         public int PostId { get; set; }
         public string Type { get; set; }
         [Required, DataType(DataType.DateTime)]
-        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy hh:mm", ApplyFormatInEditMode = false)]
-        public DateTime CreationDate { get; set; }
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy hh:mm}", ApplyFormatInEditMode = false)]       
+        public DateTime CreationDate { get; private set; } = DateTime.Now;
         [Required]
         public string Content { get; set; }
         [Required]
