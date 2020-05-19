@@ -18,10 +18,13 @@ namespace TpmManager.Models
             Author = post.Author;
             Machine = post.Machine;
         }
-        [Required]
-        public int MachineId { get; set; }
-        [Required]
+        public Post(int id)
+        {
+            MachineId = id;
+        }
+
         public int PostId { get; set; }
+        public int MachineId { get; set; }
         public string Type { get; set; }
         [Required, DataType(DataType.DateTime)]
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy hh:mm}", ApplyFormatInEditMode = false)]       

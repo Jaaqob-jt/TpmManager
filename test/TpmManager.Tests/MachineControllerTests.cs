@@ -16,6 +16,28 @@ namespace TpmManager.Tests
         DbContextOptionsBuilder<TpmContext> optionsBuilder;
         TpmContext dBContext;
         MachinesController controller;
+
+        #region MockObjects
+        Machine testMachine = new Machine
+        {
+            Name = "xUnit",
+            Location = "CLI",
+            Description = "basic test of a model"
+        };
+        Machine testMachine2 = new Machine
+        {
+            Name = "xUSnit",
+            Location = "CLIS",
+            Description = "basiSc test of a model"
+        };
+        Post testPost = new Post
+        {
+            Type = "TestType",
+            Content = "post.Content - Test",
+            Author = "John Doe"
+        };
+
+        #endregion
         public MachineControllerTests()
         {         
             //Arrange
@@ -39,10 +61,6 @@ namespace TpmManager.Tests
             {
                 dBContext.Posts.Remove(post);
             }
-            foreach (var media in dBContext.Medias)
-            {
-                dBContext.Medias.Remove(media);
-            }
             dBContext.SaveChanges();
             dBContext.Dispose();
             controller = null;
@@ -63,13 +81,6 @@ namespace TpmManager.Tests
         public void GetMachines_ReturnOneItem_DBHasOneObj()
         {
         //Given
-        Machine testMachine = new Machine
-        {
-            Name = "xUnit",
-            Location = "CLI",
-            Description = "basic test of a model"
-        };
-
         dBContext.Add(testMachine);
         dBContext.SaveChanges();
         
@@ -82,18 +93,7 @@ namespace TpmManager.Tests
         public void GetMachines_ReturnMultipleItems_DBHasMoreObj()
         {
         //Given
-        Machine testMachine = new Machine
-        {
-            Name = "xUnit",
-            Location = "CLI",
-            Description = "basic test of a model"
-        };
-        Machine testMachine2 = new Machine
-        {
-            Name = "xUSnit",
-            Location = "CLIS",
-            Description = "basiSc test of a model"
-        };
+
         dBContext.Add(testMachine);
         dBContext.Add(testMachine2);
         dBContext.SaveChanges();
@@ -147,20 +147,8 @@ namespace TpmManager.Tests
         public void GetMachinePosts_ReturnNotFound_DBIsEmpty()
         {
         //Given
-        Machine testMachine = new Machine
-        {
-            Name = "xUnit",
-            Location = "CLI",
-            Description = "basic test of a model"
-        };
-        Machine testMachine2 = new Machine
-        {
-            Name = "xUSnit",
-            Location = "CLIS",
-            Description = "basiSc test of a model"
-        };
-        dBContext.Add(testMachine);
-        dBContext.Add(testMachine2);
+        dBContext.Machines.Add(testMachine);
+        dBContext.Machines.Add(testMachine2);
         dBContext.SaveChanges();
         //When
         var result = controller.GetMachinePosts(1);
@@ -168,12 +156,138 @@ namespace TpmManager.Tests
         Assert.Equal(null, result.Value);
         }
         
-        #endregion
-
-        #region UpcomingTests
-        // Strona 144
-
-        #endregion
+        [Fact]
+        public void PostMachine_MachineCountUps_WhenValidObj()
+        {
+        //Given
+        var oldCount = dBContext.Machines.Count();
+        //When
+        var result = controller.PostNewMachine(testMachine);
         
+        //Then
+        Assert.Equal(++oldCount, dBContext.Machines.Count());
+        }
+
+        [Fact]
+        public void PostNewMachine_Return201_WhenCreatingObj()
+        {
+        //Given
+        
+        //When
+        var result = controller.PostNewMachine(testMachine);
+        //Then
+        Assert.IsType<CreatedAtActionResult>(result.Result);
+        }
+        #endregion
+        [Fact]
+        public void PostNextPost_PostCountUps_WhenValidObj()
+        {
+        //Given
+
+        dBContext.Machines.Add(testMachine);
+        dBContext.SaveChanges();
+        
+        var oldCount = dBContext.Posts.Count();
+        //When
+        var result = controller.PostNextPost(testPost, testMachine.MachineId);
+        
+        //Then
+        Assert.Equal(++oldCount, dBContext.Posts.Count());
+        }
+
+        [Fact]
+        public void PostNextPost_Return201_WhenCreatingObj()
+        {
+        //Given
+        dBContext.Add(testMachine);
+                
+        //When
+        var result = controller.PostNextPost(testPost, testMachine.MachineId);
+        //Then
+        Assert.IsType<CreatedAtActionResult>(result.Result);
+        }
+        
+        #region TDD-PutCommand
+
+        // Tests to do
+        // - valid object submitted = attribute updated
+        // - valid object submitted = 204
+        // - invalid object submitted = 400 Bad Request
+        // - invalid object submitted = Object not changed
+
+        [Fact]
+        public void PutMachine_ValidObj_UpdatedOK()
+        {
+        //Given
+        dBContext.Machines.Add(testMachine);
+        dBContext.SaveChanges();
+
+        var machId = testMachine.MachineId;
+        testMachine.Description = "UPDATED";
+
+        //When
+        controller.PutMachine(machId, testMachine);
+        var result = dBContext.Machines.Find(machId);
+        //Then
+        Assert.Equal(testMachine.Description, result.Description);
+
+        }
+
+        [Fact]
+        public void PutMachine_ValidObj_204()
+        {
+        //Given
+        dBContext.Machines.Add(testMachine);
+        dBContext.SaveChanges();
+
+        var machId = testMachine.MachineId;
+        testMachine.Description = "UPDATED";
+
+        //When
+        var result = controller.PutMachine(machId, testMachine);
+        
+        //Then
+        Assert.IsType<NoContentResult>(result);
+        }
+
+        [Fact]
+        public void PutMachine_InvObj_400()
+        {
+        //Given
+        dBContext.Machines.Add(testMachine);
+        dBContext.SaveChanges();
+
+        var mId = testMachine.MachineId;
+
+        testMachine.Description = "UPDATED";
+
+        //When
+        var result = controller.PutMachine(++mId, testMachine);
+        //Then
+        Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public void PutMachine_InvObj_NoChange()
+        {
+        //Given
+        dBContext.Machines.Add(testMachine);
+        dBContext.SaveChanges();
+
+        var mId = testMachine.MachineId;
+
+        testMachine.Description = "UPDATED";
+
+        //When
+        controller.PutMachine(++mId, testMachine);
+        var result = dBContext.Machines.Find(testMachine.MachineId);
+        //Then
+        Assert.Equal(testMachine.Description, result.Description);
+        }
+        
+        
+        // Strona 149 - DELETE
+        
+        #endregion
     }
 }

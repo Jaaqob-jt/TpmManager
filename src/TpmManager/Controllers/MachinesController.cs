@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using TpmManager.Models;
+using System.IO;
+using Microsoft.EntityFrameworkCore;
 
 namespace TpmManager.Controllers
 {
@@ -12,7 +14,6 @@ namespace TpmManager.Controllers
 
         public readonly TpmContext _context;
         public MachinesController(TpmContext context) => _context = context;
-
 
         // GET api/Machines
         [HttpGet, Route("api/Machines")]
@@ -41,8 +42,8 @@ namespace TpmManager.Controllers
             return NotFound();
         }
 
-        // GET api/Machines/{id}/Posts
-        [HttpGet, Route("api/Machines/Posts/{id}")]
+        // GET api/Posts/{id}
+        [HttpGet, Route("api/Posts/{id}")]
         public ActionResult<IEnumerable<Post>> GetMachinePosts(int id)
         {
             var values = _context.Posts.Where(x => x.MachineId == id).ToList();
@@ -53,6 +54,17 @@ namespace TpmManager.Controllers
             return NotFound();
         }
 
+        // GET api/Posts
+        [HttpGet, Route("api/Posts")]
+        public ActionResult<IEnumerable<Post>> GetAllPosts()
+        {
+            var values = _context.Posts.ToList();
+            if (values.Any())
+            {
+                return values;
+            }
+            return NoContent();
+        }
         // GET api/Post/{pid}
         [HttpGet, Route("api/Post/{pid}")]
         public ActionResult<Post> GetSinglePost(int pid)
@@ -64,10 +76,50 @@ namespace TpmManager.Controllers
             }
             return NotFound();
         }
-        // POST api/Machines/{id}
-        [HttpPost, Route("api/Machines/{id}")]
-        public ActionResult<IEnumerable<Post>> PostNextPost(int id)
+        
+        // POST api/Post
+        [HttpPost, Route("api/Post/{id}")]
+        public ActionResult<IEnumerable<Post>> PostNextPost(Post post, int id)
         {
+            var putter = new Post(post){MachineId = id};
+            _context.Posts.Add(putter);
+
+            try
+            {
+                _context.SaveChanges();
+            } catch
+            {
+                return BadRequest();
+            }
+            return CreatedAtAction("PostNextPost", new Post{MachineId = putter.MachineId}, putter);
+        }
+    
+        // POST api/Machines
+        [HttpPost, Route("api/Machines")]
+        public ActionResult<Machine> PostNewMachine(Machine machine)
+        {
+            _context.Machines.Add(machine);
+            try
+            {
+                _context.SaveChanges();
+            } catch
+            {
+                return BadRequest();
+            }
+            return CreatedAtAction("PostNewMachine", new Machine{MachineId = machine.MachineId}, machine);
+        }
+    
+
+        // PUT api/Machines/{id}
+        [HttpPut, Route("api/Machines/{id}")]
+        public ActionResult PutMachine(int id, Machine machine)
+        {
+            if (id != machine.MachineId)
+            {
+                return BadRequest();
+            }
+            _context.Entry(machine).State = EntityState.Modified;
+            _context.SaveChanges();
             return NoContent();
         }
     }

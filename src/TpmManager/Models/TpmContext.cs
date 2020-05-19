@@ -8,6 +8,5 @@ namespace TpmManager.Models
         public TpmContext(DbContextOptions<TpmContext> options) : base(options){}
         public DbSet<Machine> Machines { get; set; }
         public DbSet<Post> Posts { get; set; }
-        public DbSet<Media> Medias { get; set; }
     }
 }
