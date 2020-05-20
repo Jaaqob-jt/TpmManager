@@ -284,10 +284,67 @@ namespace TpmManager.Tests
         //Then
         Assert.Equal(testMachine.Description, result.Description);
         }
+        #endregion
+
+        #region TDD-DELETE
+
+        // Tests to do
+        // - valid id submitted = count decrements by 1
+        // - valid id submitted = 200
+        // - invalid id submitted = 400 Bad Request
+        // - invalid id submitted = Object not changed
         
-        
-        // Strona 149 - DELETE
-        
+        [Fact]
+        public void DeleteMachine_ValidId_CountDecrem()
+        {
+        //Given
+        dBContext.Machines.Add(testMachine);
+        dBContext.Machines.Add(testMachine2);
+        dBContext.SaveChanges();
+        var machineCount = dBContext.Machines.Count();
+        //When
+        var result = controller.DeleteMachineById(testMachine.MachineId);
+        //Then
+        Assert.Equal(machineCount - 1, dBContext.Machines.Count());
+        }
+
+        [Fact]
+        public void DeleteMachine_ValidId_200()
+        {
+        //Given
+        dBContext.Machines.Add(testMachine);
+        dBContext.Machines.Add(testMachine2);
+        dBContext.SaveChanges();
+        //When
+        var result = controller.DeleteMachineById(testMachine.MachineId);
+        //Then
+        Assert.IsType<OkResult>(result);
+        }
+
+        [Fact]
+        public void DeleteMachine_InvId_400()
+        {
+        //Given
+
+        //When
+        var result = controller.DeleteMachineById(1);
+        //Then
+        Assert.IsType<BadRequestResult>(result);
+        }
+        [Fact]
+        public void DeleteMachine_InvId_ObjCountNotChanged()
+        {
+        //Given
+        dBContext.Machines.Add(testMachine);
+        dBContext.Machines.Add(testMachine2);
+        dBContext.SaveChanges();
+        var objCount = dBContext.Machines.Count();
+        //When
+        var result = controller.DeleteMachineById(17);
+        //Then
+        Assert.Equal(objCount, dBContext.Machines.Count());
+        }
+
         #endregion
     }
 }

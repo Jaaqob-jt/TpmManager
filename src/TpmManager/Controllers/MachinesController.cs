@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using TpmManager.Models;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace TpmManager.Controllers
 {
@@ -121,6 +122,20 @@ namespace TpmManager.Controllers
             _context.Entry(machine).State = EntityState.Modified;
             _context.SaveChanges();
             return NoContent();
+        }
+
+        // DELETE api/Machines/{id}
+        [HttpDelete, Route("api/Machines/{id}")]
+        public object DeleteMachineById(int id)
+        {
+            var trash = _context.Machines.Find(id);
+            if (trash == null)
+            {
+                return BadRequest();
+            }
+            _context.Machines.Remove(trash);
+            _context.SaveChanges();
+            return Ok();
         }
     }
 }
