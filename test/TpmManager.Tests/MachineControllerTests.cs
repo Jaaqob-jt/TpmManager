@@ -65,9 +65,10 @@ namespace TpmManager.Tests
             dBContext.Dispose();
             controller = null;
         }
+        
         #endregion
 
-        #region PassedTests
+        #region Get
         [Fact]
         public void GetMachines_ReturnZeroItems_WhenDBIsEmpty()
         {
@@ -156,6 +157,9 @@ namespace TpmManager.Tests
         Assert.Equal(null, result.Value);
         }
         
+        #endregion
+
+        #region Post
         [Fact]
         public void PostMachine_MachineCountUps_WhenValidObj()
         {
@@ -178,7 +182,7 @@ namespace TpmManager.Tests
         //Then
         Assert.IsType<CreatedAtActionResult>(result.Result);
         }
-        #endregion
+        
         [Fact]
         public void PostNextPost_PostCountUps_WhenValidObj()
         {
@@ -206,7 +210,9 @@ namespace TpmManager.Tests
         //Then
         Assert.IsType<CreatedAtActionResult>(result.Result);
         }
-        
+
+        #endregion
+
         #region TDD-PutCommand
 
         // Tests to do
@@ -331,6 +337,7 @@ namespace TpmManager.Tests
         //Then
         Assert.IsType<BadRequestResult>(result);
         }
+        
         [Fact]
         public void DeleteMachine_InvId_ObjCountNotChanged()
         {
