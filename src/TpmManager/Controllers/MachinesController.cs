@@ -6,6 +6,7 @@ using TpmManager.Models;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
 using System;
+using TpmManager.DTO;
 
 namespace TpmManager.Controllers
 {
@@ -16,6 +17,7 @@ namespace TpmManager.Controllers
         public readonly TpmContext _context;
         public MachinesController(TpmContext context) => _context = context;
 
+        #region REST-RAW-API
         // GET api/Machines
         [HttpGet, Route("api/Machines")]
         public ActionResult<IEnumerable<Machine>> GetMachines()
@@ -137,5 +139,62 @@ namespace TpmManager.Controllers
             _context.SaveChanges();
             return Ok();
         }
+    
+        #endregion
+    
+        #region REST-DTO
+
+        // GET api/dto/Machines
+        [HttpGet, Route("api/dto/Machines")]
+        public ActionResult<IEnumerable<MachineDTO>> GetMachinesDTO()
+        {
+            var result = _context
+                .Machines
+                .Include("Post")
+                .Select(m => new MachineDTO
+                {
+                    MachineId = m.MachineId,
+                    Name = m.Name,
+                    Location = m.Location,
+                    Description = m.Description,
+                    Status = m.Status,
+                    Post = m.Post.Select(p => new PostsDTO
+                    {
+                        PostId = p.PostId,
+                        Author = p.Author,
+                        Content = p.Content
+                    })
+                }).ToList();
+                return result;
+        }
+
+                // GET api/MachinesWP
+        [HttpGet, Route("api/MachinesWP")]
+        public ActionResult<IEnumerable<Machine>> GetMachinesWP()
+        {
+            var result = _context
+                .Machines
+                .Include("Post")
+                .Select(m => new Machine
+                {
+                    MachineId = m.MachineId,
+                    Name = m.Name,
+                    Location = m.Location,
+                    Type = m.Type,
+                    DateOfInstallation = m.DateOfInstallation,
+                    Description = m.Description,
+                    Status = m.Status,
+                    Post = m.Post.Select(p => new Post
+                    {
+                        PostId = p.PostId,
+                        MachineId = p.MachineId,
+                        Author = p.Author,
+                        Content = p.Content
+                    })
+                }).ToList();
+                return result;
+        }
+
+        #endregion
     }
 }
