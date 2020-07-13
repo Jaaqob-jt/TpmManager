@@ -35,5 +35,6 @@ namespace TpmManager.Models
         public string Status { get; set; }
         public decimal Cost { get; set; }
         public IEnumerable<Post> Post { get; set; }
+        
     }
 }

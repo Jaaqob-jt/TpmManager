@@ -195,6 +195,30 @@ namespace TpmManager.Controllers
                 return result;
         }
 
+        [HttpGet, Route("api/dto/Post/{id}")]
+        public ActionResult<PostsDTO> GetPostByID(int id)
+        {
+                var res2 = _context
+                    .Posts
+                    .Where(p => p.PostId == id)
+                    .Select(dp => new PostsDTO
+                    {
+                        PostId = dp.PostId,
+                        Content = dp.Content,
+                        Author = dp.Author,
+                        Machine = new MachineDTO 
+                        {
+                            MachineId = dp.Machine.MachineId,
+                            Name = dp.Machine.Name,
+                            Location = dp.Machine.Location,
+                            Description = dp.Machine.Description,
+                            Status = dp.Machine.Status
+                        }
+                    }).First();
+
+                return res2;
+        }
+
         #endregion
     }
 }

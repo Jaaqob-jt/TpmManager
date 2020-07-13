@@ -7,5 +7,6 @@ namespace TpmManager.DTO
         public int PostId { get; set; }
         public string Content { get; set; }
         public string Author { get; set; }
+        public MachineDTO Machine { get; set; }
     }
 }
